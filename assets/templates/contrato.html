@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+
+    <style>
+        {{style}}
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <div class="header">
+
+        <div class="logo-group">
+            <img src="{{logo_melopes}}" class="logo">
+
+            {% if logo_parceiro %}
+            <img src="{{logo_parceiro}}" class="logo">
+            {% endif %}
+        </div>
+
+        <div class="title-area">
+            <div class="partner-tag">
+                ASSESSORIA TECH & GESTÃO
+            </div>
+
+            <h1>TERMO DE PARCERIA B2B</h1>
+
+            <p>
+                Documento corporativo de parceria estratégica
+            </p>
+        </div>
+
+    </div>
+
+    <div class="section">
+
+        <div class="section-title">
+            CONTRATADA (ASSESSORIA)
+        </div>
+
+        <div class="card">
+            <strong>{{empresa_melopes}}</strong><br>
+            CNPJ: {{cnpj_melopes}}<br>
+            {{endereco_melopes}}
+        </div>
+
+    </div>
+
+    <div class="section">
+
+        <div class="section-title">
+            CONTRATANTE (CLIENTE)
+        </div>
+
+        <div class="card">
+            <strong>{{cliente_nome}}</strong><br>
+            CNPJ: {{cliente_cnpj}}<br>
+            {{cliente_endereco}}<br><br>
+
+            Representada por:
+            <strong>{{cliente_rep}}</strong>
+        </div>
+
+    </div>
+
+    <div class="section">
+
+        <div class="section-title">
+            1. ESCOPO DA PARCERIA
+        </div>
+
+        <div class="card">
+            {{escopo}}
+        </div>
+
+    </div>
+
+    <div class="section">
+
+        <div class="section-title">
+            2. CONDIÇÕES FINANCEIRAS
+        </div>
+
+        <div class="card">
+            {{condicoes}}
+        </div>
+
+    </div>
+
+    <div class="section">
+
+        <div class="section-title">
+            3. COMPLIANCE E CONFIDENCIALIDADE
+        </div>
+
+        <div class="card">
+            A M e Lopes compromete-se a tratar todas as informações
+            estratégicas, comerciais e financeiras com absoluto sigilo.
+        </div>
+
+    </div>
+
+    <div class="signatures">
+
+        <div class="signature-box">
+
+            <div class="signature-line"></div>
+
+            <strong>
+                CRISTHIAN MAMEDE LOPES
+            </strong><br>
+
+            M e Lopes Assessoria
+
+        </div>
+
+        <div class="signature-box">
+
+            <div class="signature-line"></div>
+
+            <strong>
+                {{cliente_rep}}
+            </strong><br>
+
+            {{cliente_nome}}
+
+        </div>
+
+    </div>
+
+    <div class="footer">
+
+        Documento emitido eletronicamente pela plataforma
+        M e Lopes Business Suite • {{data}}
+
+    </div>
+
+</div>
+
+</body>
+</html>
