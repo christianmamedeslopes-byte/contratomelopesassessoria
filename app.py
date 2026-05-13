@@ -291,12 +291,61 @@ st.components.v1.html(
     """,
     height=120
 )
-    st.success("Contrato gerado com sucesso.")
+# =====================================================
+# EXPORTAÇÃO / IMPRESSÃO
+# =====================================================
 
-    st.download_button(
-        label="📥 Baixar PDF",
-        data=pdf,
-        file_name=f"Contrato_{cliente_nome}.pdf",
-        mime="application/pdf",
-        use_container_width=True
-    )
+st.divider()
+
+st.info("""
+📄 Para salvar em PDF:
+
+1. Clique no botão abaixo
+2. A página abrirá em outra aba
+3. Pressione CTRL + P
+4. Escolha "Salvar como PDF"
+""")
+
+html_export = f"""
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+{carregar_css()}
+</style>
+</head>
+
+<body>
+
+{html_final}
+
+</body>
+</html>
+"""
+
+st.components.v1.html(
+    f"""
+
+    <div style="padding:20px;text-align:center;">
+
+        <a href="data:text/html;charset=utf-8,{html_export}"
+           target="_blank"
+           style="
+                background:#0f172a;
+                color:white;
+                padding:14px 24px;
+                border-radius:12px;
+                text-decoration:none;
+                font-weight:600;
+                font-family:Arial;
+           ">
+
+           🚀 Abrir versão para impressão
+
+        </a>
+
+    </div>
+
+    """,
+    height=120
+)
