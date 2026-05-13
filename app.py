@@ -1,6 +1,7 @@
 import streamlit as st
 from jinja2 import Template
-from weasyprint import HTML
+from xhtml2pdf import pisa
+from io import BytesIO
 from datetime import datetime
 import base64
 from pathlib import Path
@@ -41,9 +42,14 @@ def gerar_html(dados):
 
 def gerar_pdf(html_content):
 
-    pdf = HTML(string=html_content).write_pdf()
+    pdf_buffer = BytesIO()
 
-    return pdf
+    pisa.CreatePDF(
+        src=html_content,
+        dest=pdf_buffer
+    )
+
+    return pdf_buffer.getvalue()
 
 # =====================================================
 # SIDEBAR
