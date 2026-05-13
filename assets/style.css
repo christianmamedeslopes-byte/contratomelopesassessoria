@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@600;700&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    color: #1e293b;
+    line-height: 1.7;
+}
+
+.page {
+    padding: 50px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 25px;
+    margin-bottom: 40px;
+}
+
+.logo-group {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.logo {
+    max-height: 70px;
+}
+
+.title-area h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 28px;
+    margin: 0;
+    color: #0f172a;
+}
+
+.title-area p {
+    margin-top: 6px;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.section {
+    margin-bottom: 28px;
+}
+
+.section-title {
+    background: #0f172a;
+    color: white;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 15px;
+}
+
+.card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 20px;
+}
+
+.footer {
+    margin-top: 60px;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 20px;
+    font-size: 11px;
+    color: #64748b;
+    text-align: center;
+}
+
+.signatures {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 90px;
+    gap: 40px;
+}
+
+.signature-box {
+    width: 45%;
+    text-align: center;
+}
+
+.signature-line {
+    border-top: 1px solid #334155;
+    margin-bottom: 10px;
+    padding-top: 10px;
+}
+
+.partner-tag {
+    background: #dbeafe;
+    color: #1d4ed8;
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
