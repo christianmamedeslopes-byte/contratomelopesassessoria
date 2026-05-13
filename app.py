@@ -1,7 +1,5 @@
 import streamlit as st
 from jinja2 import Template
-from xhtml2pdf import pisa
-from io import BytesIO
 from datetime import datetime
 import base64
 
