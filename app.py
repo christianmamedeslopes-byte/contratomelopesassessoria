@@ -88,4 +88,49 @@ if gerar:
         <p>{condicoes_html}</p>
         
         <h2>3. CICLO DE RENOVAÇÃO E CANCELAMENTO</h2>
-        <p>O ciclo de prestação de serviços é de 30 dias, renovado automaticamente. Para garantir a flexibilidade e a saúde operacional de ambas as partes, o
+        <p>O ciclo de prestação de serviços é de 30 dias, renovado automaticamente. Para garantir a flexibilidade e a saúde operacional de ambas as partes, o acordo pode ser pausado ou cancelado a qualquer momento, bastando um aviso prévio de 5 dias do fechamento do ciclo.</p>
+        
+        <h2>4. TRATAMENTO DE DADOS (COMPLIANCE)</h2>
+        <p>A Me Lopes compromete-se a tratar as informações financeiras e dados de clientes finais da Contratante com absoluto sigilo, removendo qualquer identificação sensível antes de utilizar os layouts e planilhas em seu portfólio de TI.</p>
+        
+        <table class="assinaturas">
+            <tr>
+                <td style="width: 50%; text-align: center; padding-top: 40px;">
+                    <div class="linha-ass">
+                        <span class="destaque">CRISTHIAN MAMEDE LOPES</span><br>
+                        Me Lopes Assessoria<br>
+                        CNPJ: 66.283.560/0001-09
+                    </div>
+                </td>
+                <td style="width: 50%; text-align: center; padding-top: 40px;">
+                    <div class="linha-ass">
+                        <span class="destaque">{cliente_rep}</span><br>
+                        {cliente_nome}<br>
+                        CNPJ: {cliente_cnpj}
+                    </div>
+                </td>
+            </tr>
+        </table>
+        
+        <div class="footer">
+            Documento emitido e validado eletronicamente por CRISTHIAN MAMEDE LOPES | CNPJ: 66.283.560/0001-09 | Me Lopes Assessoria em {data_atual}
+        </div>
+    </body>
+    </html>
+    """
+    
+    with st.spinner("A gerar o documento oficial..."):
+        pdf_bytes = gerar_pdf_contrato(html_contrato)
+    
+    if pdf_bytes:
+        st.success("✅ Contrato gerado com sucesso!")
+        st.download_button(
+            label="📥 Descarregar Contrato (PDF)",
+            data=pdf_bytes,
+            file_name=f"Contrato_MeLopes_{cliente_nome.replace(' ', '')}.pdf",
+            mime="application/pdf",
+            use_container_width=True,
+            type="primary"
+        )
+    else:
+        st.error("Falha ao gerar o PDF. Verifique se o xhtml2pdf está a funcionar corretamente.")
