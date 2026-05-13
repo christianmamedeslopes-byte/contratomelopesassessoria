@@ -260,15 +260,37 @@ with col2:
 
 st.divider()
 
-if st.button(
-    "🚀 Gerar Contrato Premium",
-    use_container_width=True
-):
+st.info("""
+📄 Para salvar em PDF:
 
-    with st.spinner("Gerando documento corporativo..."):
+1. Clique dentro do preview
+2. Pressione CTRL + P
+3. Escolha "Salvar como PDF"
+""")
 
-        pdf = gerar_pdf(html_final)
+st.components.v1.html(
+    f"""
+    <div style="padding:20px;text-align:center;">
 
+        <a href="data:text/html;charset=utf-8,{html_final}"
+           target="_blank"
+           style="
+                background:#0f172a;
+                color:white;
+                padding:14px 24px;
+                border-radius:12px;
+                text-decoration:none;
+                font-weight:600;
+           ">
+
+           🚀 Abrir versão para impressão
+
+        </a>
+
+    </div>
+    """,
+    height=120
+)
     st.success("Contrato gerado com sucesso.")
 
     st.download_button(
