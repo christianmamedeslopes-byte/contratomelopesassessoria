@@ -1,136 +1,393 @@
 import streamlit as st
 from datetime import datetime
 from io import BytesIO
-from xhtml2pdf import pisa
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Paragraph,
+    Spacer,
+    Table,
+    TableStyle,
+    PageBreak
+)
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfbase import pdfmetrics
+from reportlab.platypus.flowables import HRFlowable
+from reportlab.lib.units import cm
 
-# 1. Configuração da Página
-st.set_page_config(page_title="Gerador de Contratos | M e Lopes", layout="centered", page_icon="📄")
+# =========================================================
+# CONFIGURAÇÃO DA PÁGINA
+# =========================================================
 
-# 2. Função para gerar o PDF (usando o xhtml2pdf que já conhece)
-def gerar_pdf_contrato(html_content):
-    result = BytesIO()
-    pdf = pisa.pisaDocument(BytesIO(html_content.encode("UTF-8")), result)
-    return result.getvalue() if not pdf.err else None
+st.set_page_config(
+    page_title="M e Lopes | Gerador de Contratos",
+    page_icon="📄",
+    layout="centered"
+)
 
-# 3. Interface Visual no Streamlit
-st.title("📄 Gerador de Contratos B2B")
-st.markdown("Preencha os dados do cliente e do escopo para gerar o contrato automaticamente com a marca **M e Lopes Assessoria**.")
+# =========================================================
+# ESTILO VISUAL STREAMLIT
+# =========================================================
 
-with st.form("form_contrato"):
-    st.subheader("🏢 Dados do Cliente (Contratante)")
-    col1, col2 = st.columns(2)
-    with col1:
-        cliente_nome = st.text_input("Nome da Empresa", value="G.A SOLAR")
-        cliente_cnpj = st.text_input("CNPJ", value="66.283.865/0001-10")
-    with col2:
-        cliente_rep = st.text_input("Representante Legal", value="Wellington Rafael Nascimento de Sá")
-        cliente_end = st.text_input("Endereço", value="Rua Jose Francelino Teixeira Gomes, 196, Campo Grande - MS")
-        
-    st.subheader("🎯 Detalhes do Acordo")
-    # Os textos padrão já vêm preenchidos com o modelo que enviou
-    escopo = st.text_area(
-        "1. Escopo da Parceria", 
-        height=100,
-        value="• Engenharia de Dados: Modelagem de Relatórios de Caixa de Obra, Relatórios de Conclusão e estruturação lógica de Propostas Comerciais.\n• Interface Visual (UI): Desenvolvimento de banners e padronização visual para canais digitais."
+st.markdown("""
+<style>
+    .main {
+        background-color: #f8fafc;
+    }
+
+    h1, h2, h3 {
+        color: #0f172a;
+    }
+
+    .stButton button {
+        background: linear-gradient(90deg, #0f172a, #1e293b);
+        color: white;
+        border-radius: 12px;
+        height: 50px;
+        font-size: 16px;
+        border: none;
+        font-weight: bold;
+    }
+
+    .stDownloadButton button {
+        background: linear-gradient(90deg, #065f46, #047857);
+        color: white;
+        border-radius: 12px;
+        height: 50px;
+        font-size: 16px;
+        border: none;
+        font-weight: bold;
+    }
+
+    textarea, input {
+        border-radius: 10px !important;
+    }
+
+    .block-container {
+        padding-top: 2rem;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# =========================================================
+# FUNÇÃO PDF PROFISSIONAL
+# =========================================================
+
+def gerar_pdf(dados):
+
+    buffer = BytesIO()
+
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        rightMargin=2*cm,
+        leftMargin=2*cm,
+        topMargin=2.5*cm,
+        bottomMargin=2cm
     )
-    
-    condicoes = st.text_area(
-        "2. Condições Financeiras e Permuta", 
-        height=100,
-        value="Acordo de Cooperação Estratégica: Este termo não envolve repasse financeiro (R$). Em permuta pela execução técnica, a Contratante cede o direito de uso das entregas geradas (devidamente anonimizadas) para composição do portfólio público e comercial da Me Lopes."
-    )
-    
-    gerar = st.form_submit_button("Gerar Contrato em PDF", use_container_width=True, type="primary")
 
-# 4. Lógica de Montagem do Documento
-if gerar:
-    data_atual = datetime.now().strftime("%d/%m/%Y")
-    
-    # Substituímos as quebras de linha do ecrã por quebras de linha em HTML
-    escopo_html = escopo.replace('\n', '<br>')
-    condicoes_html = condicoes.replace('\n', '<br>')
-    
-    html_contrato = f"""
-    <html>
-    <head>
-        <style>
-            @page {{
-                size: A4 portrait;
-                margin: 2.5cm 2cm;
-            }}
-            body {{ font-family: Helvetica, Arial, sans-serif; font-size: 12px; color: #1e293b; line-height: 1.6; }}
-            h1 {{ text-align: center; font-size: 16px; color: #0f172a; border-bottom: 2px solid #0f172a; padding-bottom: 8px; margin-bottom: 30px; }}
-            h2 {{ font-size: 12px; color: #0f172a; background-color: #f1f5f9; padding: 6px 10px; margin-top: 25px; text-transform: uppercase; }}
-            .destaque {{ font-weight: bold; color: #000; }}
-            .assinaturas {{ margin-top: 80px; width: 100%; text-align: center; page-break-inside: avoid; }}
-            .linha-ass {{ border-top: 1px solid #334155; width: 85%; margin: 0 auto; padding-top: 8px; }}
-            .footer {{ text-align: center; font-size: 8.5px; color: #64748b; margin-top: 50px; border-top: 1px solid #e2e8f0; padding-top: 10px; }}
-        </style>
-    </head>
-    <body>
-        <h1>TERMO DE PARCERIA E ASSESSORIA TÉCNICA B2B</h1>
-        
-        <p><span class="destaque">CONTRATADA (ASSESSORIA)</span><br>
-        <span class="destaque">CRISTHIAN MAMEDE LOPES (Me Lopes Assessoria)</span><br>
-        CNPJ: 66.283.560/0001-09<br>
-        Rua Espírito Santo, 2215, Centro, Sidrolândia - MS</p>
-        
-        <p><span class="destaque">CONTRATANTE (CLIENTE)</span><br>
-        <span class="destaque">{cliente_nome}</span><br>
-        CNPJ: {cliente_cnpj}<br>
-        {cliente_end}<br>
-        Representada por: {cliente_rep}</p>
-        
-        <h2>1. ESCOPO DA PARCERIA</h2>
-        <p>{escopo_html}</p>
-        
-        <h2>2. CONDIÇÕES FINANCEIRAS E PERMUTA</h2>
-        <p>{condicoes_html}</p>
-        
-        <h2>3. CICLO DE RENOVAÇÃO E CANCELAMENTO</h2>
-        <p>O ciclo de prestação de serviços é de 30 dias, renovado automaticamente. Para garantir a flexibilidade e a saúde operacional de ambas as partes, o acordo pode ser pausado ou cancelado a qualquer momento, bastando um aviso prévio de 5 dias do fechamento do ciclo.</p>
-        
-        <h2>4. TRATAMENTO DE DADOS (COMPLIANCE)</h2>
-        <p>A Me Lopes compromete-se a tratar as informações financeiras e dados de clientes finais da Contratante com absoluto sigilo, removendo qualquer identificação sensível antes de utilizar os layouts e planilhas em seu portfólio de TI.</p>
-        
-        <table class="assinaturas">
-            <tr>
-                <td style="width: 50%; text-align: center; padding-top: 40px;">
-                    <div class="linha-ass">
-                        <span class="destaque">CRISTHIAN MAMEDE LOPES</span><br>
-                        Me Lopes Assessoria<br>
-                        CNPJ: 66.283.560/0001-09
-                    </div>
-                </td>
-                <td style="width: 50%; text-align: center; padding-top: 40px;">
-                    <div class="linha-ass">
-                        <span class="destaque">{cliente_rep}</span><br>
-                        {cliente_nome}<br>
-                        CNPJ: {cliente_cnpj}
-                    </div>
-                </td>
-            </tr>
-        </table>
-        
-        <div class="footer">
-            Documento emitido e validado eletronicamente por CRISTHIAN MAMEDE LOPES | CNPJ: 66.283.560/0001-09 | Me Lopes Assessoria em {data_atual}
-        </div>
-    </body>
-    </html>
-    """
-    
-    with st.spinner("A gerar o documento oficial..."):
-        pdf_bytes = gerar_pdf_contrato(html_contrato)
-    
-    if pdf_bytes:
-        st.success("✅ Contrato gerado com sucesso!")
-        st.download_button(
-            label="📥 Descarregar Contrato (PDF)",
-            data=pdf_bytes,
-            file_name=f"Contrato_MeLopes_{cliente_nome.replace(' ', '')}.pdf",
-            mime="application/pdf",
-            use_container_width=True,
-            type="primary"
+    styles = getSampleStyleSheet()
+
+    # =========================
+    # ESTILOS CUSTOMIZADOS
+    # =========================
+
+    titulo_style = ParagraphStyle(
+        "Titulo",
+        parent=styles["Heading1"],
+        fontName="Helvetica-Bold",
+        fontSize=22,
+        leading=28,
+        alignment=TA_CENTER,
+        textColor=colors.HexColor("#0f172a"),
+        spaceAfter=25
+    )
+
+    subtitulo_style = ParagraphStyle(
+        "Subtitulo",
+        parent=styles["Heading2"],
+        fontName="Helvetica-Bold",
+        fontSize=12,
+        textColor=colors.white,
+        backColor=colors.HexColor("#0f172a"),
+        leading=18,
+        leftIndent=8,
+        spaceBefore=18,
+        spaceAfter=12
+    )
+
+    texto_style = ParagraphStyle(
+        "Texto",
+        parent=styles["BodyText"],
+        fontName="Helvetica",
+        fontSize=11.5,
+        leading=22,
+        alignment=TA_JUSTIFY,
+        textColor=colors.HexColor("#1e293b")
+    )
+
+    destaque_style = ParagraphStyle(
+        "Destaque",
+        parent=texto_style,
+        fontName="Helvetica-Bold"
+    )
+
+    footer_style = ParagraphStyle(
+        "Footer",
+        parent=styles["BodyText"],
+        fontName="Helvetica",
+        fontSize=8,
+        alignment=TA_CENTER,
+        textColor=colors.HexColor("#64748b")
+    )
+
+    elementos = []
+
+    # =========================================================
+    # CABEÇALHO
+    # =========================================================
+
+    elementos.append(
+        Paragraph(
+            "TERMO DE PARCERIA E ASSESSORIA TÉCNICA B2B",
+            titulo_style
         )
-    else:
-        st.error("Falha ao gerar o PDF. Verifique se o xhtml2pdf está a funcionar corretamente.")
+    )
+
+    elementos.append(HRFlowable(
+        width="100%",
+        color=colors.HexColor("#cbd5e1"),
+        thickness=1
+    ))
+
+    elementos.append(Spacer(1, 20))
+
+    # =========================================================
+    # CONTRATADA
+    # =========================================================
+
+    elementos.append(Paragraph("CONTRATADA (ASSESSORIA)", subtitulo_style))
+
+    contratada = f"""
+    <b>CRISTHIAN MAMEDE LOPES (Me Lopes Assessoria)</b><br/>
+    CNPJ: 66.283.560/0001-09<br/>
+    Rua Espírito Santo, 2215, Centro, Sidrolândia - MS
+    """
+
+    elementos.append(Paragraph(contratada, texto_style))
+
+    # =========================================================
+    # CONTRATANTE
+    # =========================================================
+
+    elementos.append(Paragraph("CONTRATANTE (CLIENTE)", subtitulo_style))
+
+    contratante = f"""
+    <b>{dados['cliente_nome']}</b><br/>
+    CNPJ: {dados['cliente_cnpj']}<br/>
+    {dados['cliente_end']}<br/>
+    Representada por: {dados['cliente_rep']}
+    """
+
+    elementos.append(Paragraph(contratante, texto_style))
+
+    # =========================================================
+    # SEÇÕES
+    # =========================================================
+
+    secoes = [
+        ("1. ESCOPO DA PARCERIA", dados["escopo"]),
+        ("2. CONDIÇÕES FINANCEIRAS E PERMUTA", dados["condicoes"]),
+        (
+            "3. CICLO DE RENOVAÇÃO E CANCELAMENTO",
+            """
+            O ciclo de prestação de serviços é de 30 dias, renovado automaticamente.
+            O acordo pode ser pausado ou cancelado mediante aviso prévio mínimo de 5 dias.
+            """
+        ),
+        (
+            "4. TRATAMENTO DE DADOS (COMPLIANCE)",
+            """
+            A Me Lopes compromete-se a tratar todas as informações financeiras
+            e estratégicas da Contratante com absoluto sigilo, removendo qualquer
+            dado sensível antes da utilização em portfólio técnico ou comercial.
+            """
+        )
+    ]
+
+    for titulo, conteudo in secoes:
+        elementos.append(Paragraph(titulo, subtitulo_style))
+        elementos.append(Paragraph(conteudo.replace("\n", "<br/>"), texto_style))
+
+    elementos.append(Spacer(1, 60))
+
+    # =========================================================
+    # ASSINATURAS
+    # =========================================================
+
+    assinatura_data = [
+        [
+            Paragraph(
+                f"""
+                _______________________________<br/>
+                <b>CRISTHIAN MAMEDE LOPES</b><br/>
+                Me Lopes Assessoria
+                """,
+                texto_style
+            ),
+            Paragraph(
+                f"""
+                _______________________________<br/>
+                <b>{dados['cliente_rep']}</b><br/>
+                {dados['cliente_nome']}
+                """,
+                texto_style
+            )
+        ]
+    ]
+
+    assinatura_table = Table(
+        assinatura_data,
+        colWidths=[7.5*cm, 7.5*cm]
+    )
+
+    assinatura_table.setStyle(TableStyle([
+        ("ALIGN", (0,0), (-1,-1), "CENTER"),
+        ("VALIGN", (0,0), (-1,-1), "TOP"),
+    ]))
+
+    elementos.append(assinatura_table)
+
+    elementos.append(Spacer(1, 40))
+
+    # =========================================================
+    # FOOTER
+    # =========================================================
+
+    data_atual = datetime.now().strftime("%d/%m/%Y")
+
+    footer = f"""
+    Documento emitido eletronicamente por
+    <b>CRISTHIAN MAMEDE LOPES</b> |
+    Me Lopes Assessoria |
+    {data_atual}
+    """
+
+    elementos.append(HRFlowable(
+        width="100%",
+        color=colors.HexColor("#e2e8f0"),
+        thickness=1
+    ))
+
+    elementos.append(Spacer(1, 10))
+
+    elementos.append(Paragraph(footer, footer_style))
+
+    # =========================================================
+    # GERAÇÃO PDF
+    # =========================================================
+
+    doc.build(elementos)
+
+    pdf = buffer.getvalue()
+    buffer.close()
+
+    return pdf
+
+# =========================================================
+# INTERFACE
+# =========================================================
+
+st.title("📄 Gerador Premium de Contratos")
+st.caption("M e Lopes Assessoria • Contratos elegantes • PDF profissional")
+
+with st.form("contrato_form"):
+
+    st.subheader("🏢 Dados do Cliente")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        cliente_nome = st.text_input(
+            "Nome da Empresa",
+            value="G.A SOLAR"
+        )
+
+        cliente_cnpj = st.text_input(
+            "CNPJ",
+            value="66.283.865/0001-10"
+        )
+
+    with col2:
+        cliente_rep = st.text_input(
+            "Representante Legal",
+            value="Wellington Rafael Nascimento de Sá"
+        )
+
+        cliente_end = st.text_input(
+            "Endereço",
+            value="Rua Jose Francelino Teixeira Gomes, 196, Campo Grande - MS"
+        )
+
+    st.subheader("🎯 Escopo do Projeto")
+
+    escopo = st.text_area(
+        "Escopo",
+        height=180,
+        value="""
+• Engenharia de Dados
+• Modelagem de relatórios financeiros
+• Relatórios de conclusão
+• Estruturação lógica de propostas comerciais
+• Desenvolvimento visual e UI
+• Padronização visual digital
+        """
+    )
+
+    condicoes = st.text_area(
+        "Condições Financeiras",
+        height=150,
+        value="""
+Acordo de cooperação estratégica sem repasse financeiro direto.
+Em permuta pela execução técnica, a contratante cede o direito
+de uso das entregas anonimizadas para composição de portfólio
+técnico e comercial da Me Lopes Assessoria.
+        """
+    )
+
+    submit = st.form_submit_button(
+        "🚀 Gerar Contrato Profissional",
+        use_container_width=True
+    )
+
+# =========================================================
+# PROCESSAMENTO
+# =========================================================
+
+if submit:
+
+    dados = {
+        "cliente_nome": cliente_nome,
+        "cliente_cnpj": cliente_cnpj,
+        "cliente_rep": cliente_rep,
+        "cliente_end": cliente_end,
+        "escopo": escopo,
+        "condicoes": condicoes
+    }
+
+    with st.spinner("Gerando contrato premium..."):
+
+        pdf = gerar_pdf(dados)
+
+    st.success("✅ Contrato gerado com sucesso.")
+
+    st.download_button(
+        label="📥 BAIXAR PDF",
+        data=pdf,
+        file_name=f"Contrato_{cliente_nome}.pdf",
+        mime="application/pdf",
+        use_container_width=True
+    )
