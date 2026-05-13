@@ -84,20 +84,6 @@ def gerar_html(dados):
     template = Template(carregar_template())
 
     return template.render(**dados)
-
-
-def gerar_pdf(html_content):
-
-    pdf_buffer = BytesIO()
-
-    pisa.CreatePDF(
-        src=html_content,
-        dest=pdf_buffer
-    )
-
-    return pdf_buffer.getvalue()
-
-
 # =====================================================
 # SIDEBAR
 # =====================================================
