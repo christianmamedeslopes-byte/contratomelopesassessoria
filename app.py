@@ -81,14 +81,13 @@ def gerar_pdf(dados):
     buffer = BytesIO()
 
     doc = SimpleDocTemplate(
-        buffer,
-        pagesize=A4,
-        rightMargin=2*cm,
-        leftMargin=2*cm,
-        topMargin=2.5*cm,
-        bottomMargin=2cm
-    )
-
+    buffer,
+    pagesize=A4,
+    rightMargin=2 * cm,
+    leftMargin=2 * cm,
+    topMargin=2.5 * cm,
+    bottomMargin=2 * cm
+)
     styles = getSampleStyleSheet()
 
     # =========================
