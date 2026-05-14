@@ -1,145 +1,148 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-
-    <style>
-        {{style}}
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Termo de Parceria B2B — M e Lopes Assessoria</title>
+    <style>{{ style }}</style>
 </head>
-
 <body>
-
 <div class="page">
 
+    <!-- ══ CABEÇALHO ════════════════════════════ -->
     <div class="header">
 
         <div class="logo-group">
-            <img src="{{logo_melopes}}" class="logo">
+            {% if logo_melopes %}
+                <img src="{{ logo_melopes }}" class="logo" alt="M e Lopes Assessoria">
+            {% endif %}
 
             {% if logo_parceiro %}
-            <img src="{{logo_parceiro}}" class="logo">
+                <div class="logo-divider"></div>
+                <img src="{{ logo_parceiro }}" class="logo" alt="{{ cliente_nome }}">
             {% endif %}
         </div>
 
         <div class="title-area">
-            <div class="partner-tag">
-                ASSESSORIA TECH & GESTÃO
+            <div class="doc-badge">Assessoria Tech &amp; Gestão</div>
+            <h1>Termo de Parceria B2B</h1>
+            <p class="doc-subtitle">Documento corporativo de parceria estratégica</p>
+        </div>
+
+    </div>
+
+    <!-- ══ PARTES ════════════════════════════════ -->
+    <div class="parties-grid">
+
+        <div class="section">
+            <div class="section-header">
+                <div class="section-number">A</div>
+                <span class="section-title">Contratada (Assessoria)</span>
             </div>
-
-            <h1>TERMO DE PARCERIA B2B</h1>
-
-            <p>
-                Documento corporativo de parceria estratégica
-            </p>
+            <div class="card">
+                <span class="label">Empresa prestadora de serviços</span>
+                <strong>{{ empresa_melopes }}</strong><br>
+                CNPJ: {{ cnpj_melopes }}<br>
+                {{ endereco_melopes }}
+            </div>
         </div>
 
+        <div class="section">
+            <div class="section-header">
+                <div class="section-number">B</div>
+                <span class="section-title">Contratante (Cliente)</span>
+            </div>
+            <div class="card">
+                <span class="label">Empresa contratante</span>
+                <strong>{{ cliente_nome }}</strong><br>
+                CNPJ: {{ cliente_cnpj }}<br>
+                {{ cliente_endereco }}<br><br>
+                Representada por:<br>
+                <strong>{{ cliente_rep }}</strong>
+            </div>
+        </div>
+
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- ══ CLÁUSULAS ═════════════════════════════ -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">1</div>
+            <span class="section-title">Escopo da Parceria</span>
+        </div>
+        <div class="card">
+            {{ escopo }}
+        </div>
     </div>
 
     <div class="section">
-
-        <div class="section-title">
-            CONTRATADA (ASSESSORIA)
+        <div class="section-header">
+            <div class="section-number">2</div>
+            <span class="section-title">Condições Financeiras</span>
         </div>
-
         <div class="card">
-            <strong>{{empresa_melopes}}</strong><br>
-            CNPJ: {{cnpj_melopes}}<br>
-            {{endereco_melopes}}
+            {{ condicoes }}
         </div>
-
     </div>
 
     <div class="section">
-
-        <div class="section-title">
-            CONTRATANTE (CLIENTE)
+        <div class="section-header">
+            <div class="section-number">3</div>
+            <span class="section-title">Compliance e Confidencialidade</span>
         </div>
-
         <div class="card">
-            <strong>{{cliente_nome}}</strong><br>
-            CNPJ: {{cliente_cnpj}}<br>
-            {{cliente_endereco}}<br><br>
-
-            Representada por:
-            <strong>{{cliente_rep}}</strong>
+            A <strong>{{ empresa_melopes }}</strong> compromete-se a tratar todas
+            as informações estratégicas, comerciais e financeiras compartilhadas
+            pela contratante com absoluto sigilo, vedada a divulgação a terceiros
+            sem autorização expressa, durante a vigência e após o encerramento
+            desta parceria.
         </div>
-
     </div>
 
     <div class="section">
-
-        <div class="section-title">
-            1. ESCOPO DA PARCERIA
+        <div class="section-header">
+            <div class="section-number">4</div>
+            <span class="section-title">Vigência e Rescisão</span>
         </div>
-
         <div class="card">
-            {{escopo}}
+            O presente instrumento entra em vigor na data de sua assinatura,
+            por prazo indeterminado, podendo ser rescindido por qualquer das
+            partes mediante notificação prévia de <strong>30 (trinta) dias</strong>,
+            sem incidência de penalidades, desde que respeitadas as obrigações
+            já assumidas.
         </div>
-
     </div>
 
-    <div class="section">
-
-        <div class="section-title">
-            2. CONDIÇÕES FINANCEIRAS
-        </div>
-
-        <div class="card">
-            {{condicoes}}
-        </div>
-
-    </div>
-
-    <div class="section">
-
-        <div class="section-title">
-            3. COMPLIANCE E CONFIDENCIALIDADE
-        </div>
-
-        <div class="card">
-            A M e Lopes compromete-se a tratar todas as informações
-            estratégicas, comerciais e financeiras com absoluto sigilo.
-        </div>
-
-    </div>
-
+    <!-- ══ ASSINATURAS ════════════════════════════ -->
     <div class="signatures">
 
         <div class="signature-box">
-
             <div class="signature-line"></div>
-
-            <strong>
-                CRISTHIAN MAMEDE LOPES
-            </strong><br>
-
-            M e Lopes Assessoria
-
+            <div class="signature-name">Cristhian Mamede Lopes</div>
+            <div class="signature-role">{{ empresa_melopes }}</div>
+            <div class="signature-cnpj">CNPJ {{ cnpj_melopes }}</div>
         </div>
 
         <div class="signature-box">
-
             <div class="signature-line"></div>
-
-            <strong>
-                {{cliente_rep}}
-            </strong><br>
-
-            {{cliente_nome}}
-
+            <div class="signature-name">{{ cliente_rep }}</div>
+            <div class="signature-role">{{ cliente_nome }}</div>
+            <div class="signature-cnpj">CNPJ {{ cliente_cnpj }}</div>
         </div>
 
     </div>
 
+    <!-- ══ RODAPÉ ═════════════════════════════════ -->
     <div class="footer">
-
-        Documento emitido eletronicamente pela plataforma
-        M e Lopes Business Suite • {{data}}
-
+        <div class="footer-brand">
+            <span class="footer-dot"></span>
+            M e Lopes Business Suite
+        </div>
+        <span>{{ endereco_melopes }} &nbsp;·&nbsp; Emitido em {{ data }}</span>
     </div>
 
 </div>
-
 </body>
 </html>
