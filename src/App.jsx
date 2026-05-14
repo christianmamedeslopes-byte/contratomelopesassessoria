@@ -1,19 +1,18 @@
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from "./components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
-import { queryClientInstance } from '@/lib/query-client'
+import { queryClientInstance } from './lib/query-client' // Alterado @ para .
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 //import PageNotFound from './lib/PageNotFound';
-import { AuthProvider, useAuth } from '@/lib/AuthContext';
-import UserNotRegisteredError from '@/components/UserNotRegisteredError';
-import AppLayout from '@/components/layout/AppLayout';
-import Dashboard from '@/pages/Dashboard';
-import NewContract from '@/pages/NewContract';
-import ContractList from '@/pages/ContractList';
-import ContractDetail from '@/pages/ContractDetail';
+import { AuthProvider, useAuth } from './lib/AuthContext'; // Alterado @ para .
+import UserNotRegisteredError from './components/UserNotRegisteredError'; // Alterado @ para .
+import AppLayout from './components/layout/AppLayout'; // Alterado @ para .
+import Dashboard from './pages/Dashboard'; // Alterado @ para .
+import NewContract from './pages/NewContract'; // Alterado @ para .
+import ContractList from './pages/ContractList'; // Alterado @ para .
+import ContractDetail from './pages/ContractDetail'; // Alterado @ para .
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
-
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
