@@ -1,0 +1,85 @@
+{
+  "name": "Contract",
+  "type": "object",
+  "properties": {
+    "contract_type": {
+      "type": "string",
+      "enum": [
+        "b2b",
+        "prestacao_servico",
+        "consultoria",
+        "confidencialidade",
+        "parceria_comercial"
+      ],
+      "description": "Tipo do contrato"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "rascunho",
+        "enviado",
+        "assinado",
+        "cancelado"
+      ],
+      "default": "rascunho",
+      "description": "Status do contrato"
+    },
+    "empresa_contratada": {
+      "type": "string",
+      "description": "Nome da empresa contratada"
+    },
+    "cnpj_contratada": {
+      "type": "string",
+      "description": "CNPJ da empresa contratada"
+    },
+    "endereco_contratada": {
+      "type": "string",
+      "description": "Endere\u00e7o da empresa contratada"
+    },
+    "representante_contratada": {
+      "type": "string",
+      "description": "Nome do representante da contratada"
+    },
+    "cliente_nome": {
+      "type": "string",
+      "description": "Nome da empresa cliente"
+    },
+    "cliente_cnpj": {
+      "type": "string",
+      "description": "CNPJ do cliente"
+    },
+    "cliente_endereco": {
+      "type": "string",
+      "description": "Endere\u00e7o do cliente"
+    },
+    "cliente_representante": {
+      "type": "string",
+      "description": "Nome do representante do cliente"
+    },
+    "escopo": {
+      "type": "string",
+      "description": "Escopo da parceria / servi\u00e7o"
+    },
+    "condicoes_financeiras": {
+      "type": "string",
+      "description": "Condi\u00e7\u00f5es financeiras"
+    },
+    "vigencia": {
+      "type": "string",
+      "description": "Prazo de vig\u00eancia"
+    },
+    "valor": {
+      "type": "number",
+      "description": "Valor do contrato"
+    },
+    "data_emissao": {
+      "type": "string",
+      "format": "date",
+      "description": "Data de emiss\u00e3o"
+    }
+  },
+  "required": [
+    "contract_type",
+    "cliente_nome"
+  ]
+}
