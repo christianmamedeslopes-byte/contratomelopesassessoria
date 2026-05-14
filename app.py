@@ -2,6 +2,7 @@ import streamlit as st
 from jinja2 import Template
 from datetime import datetime
 import base64
+import os
 
 # =====================================================
 # CONFIGURAÇÃO DA PÁGINA
@@ -19,21 +20,12 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-
-    .main {
-        background-color: #f8fafc;
-    }
-
-    .block-container {
-        padding-top: 2rem;
-    }
-
-    h1, h2, h3 {
-        color: #0f172a;
-    }
+    .main { background-color: #f8fafc; }
+    .block-container { padding-top: 2rem; }
+    h1, h2, h3 { color: #0f172a; }
 
     .stButton button {
-        background: linear-gradient(90deg,#0f172a,#1e293b);
+        background: linear-gradient(90deg, #0f172a, #1e293b);
         color: white;
         border: none;
         border-radius: 12px;
@@ -43,59 +35,94 @@ st.markdown("""
     }
 
     .stDownloadButton button {
-        background: linear-gradient(90deg,#065f46,#047857);
+        background: linear-gradient(90deg, #065f46, #047857);
         color: white;
         border: none;
         border-radius: 12px;
         height: 52px;
         font-weight: 600;
         font-size: 16px;
+        width: 100%;
     }
-
 </style>
 """, unsafe_allow_html=True)
 
 # =====================================================
-# FUNÇÕES
+# FUNÇÕES UTILITÁRIAS
 # =====================================================
 
-def image_to_base64(image_file):
-
+def image_to_base64(image_file) -> str | None:
+    """Converte um arquivo de imagem para string base64."""
     if image_file is None:
         return None
-
     return base64.b64encode(image_file.read()).decode()
 
 
-def carregar_css():
-
-    with open("assets/style.css", "r", encoding="utf-8") as f:
+@st.cache_data
+def carregar_css() -> str:
+    """Carrega o CSS do contrato. Usa cache para evitar releituras."""
+    path = "assets/style.css"
+    if not os.path.exists(path):
+        st.error(f"Arquivo não encontrado: {path}")
+        return ""
+    with open(path, "r", encoding="utf-8") as f:
         return f.read()
 
 
-def carregar_template():
-
-    with open("assets/templates/contrato.html", "r", encoding="utf-8") as f:
+@st.cache_data
+def carregar_template() -> str:
+    """Carrega o template HTML do contrato. Usa cache para evitar releituras."""
+    path = "assets/templates/contrato.html"
+    if not os.path.exists(path):
+        st.error(f"Arquivo não encontrado: {path}")
+        return ""
+    with open(path, "r", encoding="utf-8") as f:
         return f.read()
 
 
-def gerar_html(dados):
+def carregar_logo_melopes() -> str | None:
+    """Carrega o logo principal em base64."""
+    path = "assets/logo.png"
+    if not os.path.exists(path):
+        st.warning("Logo da M e Lopes não encontrado em assets/logo.png")
+        return None
+    with open(path, "rb") as f:
+        return base64.b64encode(f.read()).decode()
 
-    template = Template(carregar_template())
 
-    return template.render(**dados)
+def gerar_html(dados: dict) -> str:
+    """Renderiza o template Jinja2 com os dados fornecidos."""
+    template_str = carregar_template()
+    if not template_str:
+        return "<p>Erro ao carregar template.</p>"
+    return Template(template_str).render(**dados)
+
+
+def montar_html_exportavel(css: str, html_contrato: str) -> str:
+    """Monta o HTML completo para exportação/impressão."""
+    return f"""<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Contrato - M e Lopes Assessoria</title>
+    <style>{css}</style>
+</head>
+<body>
+    {html_contrato}
+</body>
+</html>"""
+
 # =====================================================
 # SIDEBAR
 # =====================================================
 
 st.sidebar.title("🚀 M e Lopes")
 st.sidebar.caption("Business Suite")
-
 st.sidebar.divider()
 
 st.sidebar.markdown("""
 ### Plataforma Premium
-
 - Contratos corporativos
 - Branding empresarial
 - Gestão B2B
@@ -103,11 +130,10 @@ st.sidebar.markdown("""
 """)
 
 st.sidebar.divider()
-
 st.sidebar.subheader("🖼️ Logo do Parceiro")
 
 logo_parceiro_upload = st.sidebar.file_uploader(
-    "Enviar logo PNG",
+    "Enviar logo PNG/JPG",
     type=["png", "jpg", "jpeg"]
 )
 
@@ -116,55 +142,38 @@ logo_parceiro_upload = st.sidebar.file_uploader(
 # =====================================================
 
 st.title("📄 Gerador Premium de Contratos")
+st.caption("Crie contratos empresariais modernos com identidade visual profissional.")
 
-st.caption("""
-Crie contratos empresariais modernos com identidade visual profissional.
-""")
-
-col1, col2 = st.columns([1,1])
+col1, col2 = st.columns([1, 1])
 
 # =====================================================
 # FORMULÁRIO
 # =====================================================
 
 with col1:
-
     st.subheader("🏢 Dados do Cliente")
 
-    cliente_nome = st.text_input(
-        "Empresa",
-        value="G.A SOLAR"
-    )
-
-    cliente_cnpj = st.text_input(
-        "CNPJ",
-        value="66.283.865/0001-10"
-    )
-
+    cliente_nome = st.text_input("Empresa", value="G.A SOLAR")
+    cliente_cnpj = st.text_input("CNPJ", value="66.283.865/0001-10")
     cliente_rep = st.text_input(
         "Representante Legal",
         value="Wellington Rafael Nascimento de Sá"
     )
-
-    cliente_endereco = st.text_input(
-        "Endereço",
-        value="Campo Grande - MS"
-    )
+    cliente_endereco = st.text_input("Endereço", value="Campo Grande - MS")
 
     st.divider()
-
     st.subheader("🎯 Escopo")
 
     escopo = st.text_area(
         "Escopo da parceria",
         height=220,
-        value="""
-• Engenharia de Dados
-• Relatórios financeiros
-• Modelagem operacional
-• Interface visual
-• Estruturação comercial
-        """
+        value=(
+            "• Engenharia de Dados\n"
+            "• Relatórios financeiros\n"
+            "• Modelagem operacional\n"
+            "• Interface visual\n"
+            "• Estruturação comercial"
+        )
     )
 
     st.subheader("💰 Condições")
@@ -172,180 +181,81 @@ with col1:
     condicoes = st.text_area(
         "Condições financeiras",
         height=180,
-        value="""
-Acordo estratégico sem repasse financeiro direto.
-
-As entregas poderão compor o portfólio técnico
-da M e Lopes Assessoria.
-        """
+        value=(
+            "Acordo estratégico sem repasse financeiro direto.\n\n"
+            "As entregas poderão compor o portfólio técnico\n"
+            "da M e Lopes Assessoria."
+        )
     )
 
 # =====================================================
-# LOGOS
+# MONTAGEM DOS DADOS
 # =====================================================
 
-with open("assets/logo.png", "rb") as img:
-    logo_melopes = base64.b64encode(img.read()).decode()
-
-logo_parceiro = image_to_base64(logo_parceiro_upload)
-
-# =====================================================
-# DADOS TEMPLATE
-# =====================================================
+logo_melopes_b64 = carregar_logo_melopes()
+logo_parceiro_b64 = image_to_base64(logo_parceiro_upload)
+css = carregar_css()
 
 dados = {
-    "style": carregar_css(),
-
-    "logo_melopes":
-        f"data:image/png;base64,{logo_melopes}",
-
-    "logo_parceiro":
-        f"data:image/png;base64,{logo_parceiro}"
-        if logo_parceiro else None,
-
-    "empresa_melopes":
-        "M e Lopes Assessoria",
-
-    "cnpj_melopes":
-        "66.283.560/0001-09",
-
-    "endereco_melopes":
-        "Sidrolândia - MS",
-
-    "cliente_nome":
-        cliente_nome,
-
-    "cliente_cnpj":
-        cliente_cnpj,
-
-    "cliente_endereco":
-        cliente_endereco,
-
-    "cliente_rep":
-        cliente_rep,
-
-    "escopo":
-        escopo.replace("\n", "<br>"),
-
-    "condicoes":
-        condicoes.replace("\n", "<br>"),
-
-    "data":
-        datetime.now().strftime("%d/%m/%Y")
+    "style": css,
+    "logo_melopes": (
+        f"data:image/png;base64,{logo_melopes_b64}"
+        if logo_melopes_b64 else None
+    ),
+    "logo_parceiro": (
+        f"data:image/png;base64,{logo_parceiro_b64}"
+        if logo_parceiro_b64 else None
+    ),
+    "empresa_melopes": "M e Lopes Assessoria",
+    "cnpj_melopes": "66.283.560/0001-09",
+    "endereco_melopes": "Sidrolândia - MS",
+    "cliente_nome": cliente_nome,
+    "cliente_cnpj": cliente_cnpj,
+    "cliente_endereco": cliente_endereco,
+    "cliente_rep": cliente_rep,
+    "escopo": escopo.replace("\n", "<br>"),
+    "condicoes": condicoes.replace("\n", "<br>"),
+    "data": datetime.now().strftime("%d/%m/%Y"),
 }
 
-# =====================================================
-# HTML FINAL
-# =====================================================
-
-html_final = gerar_html(dados)
+html_contrato = gerar_html(dados)
+html_exportavel = montar_html_exportavel(css, html_contrato)
 
 # =====================================================
 # PREVIEW
 # =====================================================
 
 with col2:
-
     st.subheader("👁️ Preview do Contrato")
+    st.components.v1.html(html_contrato, height=950, scrolling=True)
 
-    st.components.v1.html(
-        html_final,
-        height=950,
-        scrolling=True
+# =====================================================
+# EXPORTAÇÃO
+# =====================================================
+
+st.divider()
+
+col_dl, col_info = st.columns([1, 2])
+
+with col_dl:
+    nome_arquivo = (
+        f"contrato_{cliente_nome.replace(' ', '_').lower()}_"
+        f"{datetime.now().strftime('%Y%m%d')}.html"
     )
 
-# =====================================================
-# BOTÃO PDF
-# =====================================================
+    st.download_button(
+        label="⬇️ Baixar Contrato (HTML)",
+        data=html_exportavel.encode("utf-8"),
+        file_name=nome_arquivo,
+        mime="text/html",
+    )
 
-st.divider()
+with col_info:
+    st.info("""
+📄 **Como salvar em PDF:**
 
-st.info("""
-📄 Para salvar em PDF:
-
-1. Clique dentro do preview
-2. Pressione CTRL + P
-3. Escolha "Salvar como PDF"
+1. Clique em **Baixar Contrato (HTML)** ao lado
+2. Abra o arquivo no navegador
+3. Pressione **CTRL + P**
+4. Escolha **"Salvar como PDF"**
 """)
-
-st.components.v1.html(
-    f"""
-    <div style="padding:20px;text-align:center;">
-
-        <a href="data:text/html;charset=utf-8,{html_final}"
-           target="_blank"
-           style="
-                background:#0f172a;
-                color:white;
-                padding:14px 24px;
-                border-radius:12px;
-                text-decoration:none;
-                font-weight:600;
-           ">
-
-           🚀 Abrir versão para impressão
-
-        </a>
-
-    </div>
-    """,
-    height=120
-)
-# =====================================================
-# EXPORTAÇÃO / IMPRESSÃO
-# =====================================================
-
-st.divider()
-
-st.info("""
-📄 Para salvar em PDF:
-
-1. Clique no botão abaixo
-2. A página abrirá em outra aba
-3. Pressione CTRL + P
-4. Escolha "Salvar como PDF"
-""")
-
-html_export = f"""
-<html>
-<head>
-<meta charset="utf-8">
-<style>
-{carregar_css()}
-</style>
-</head>
-
-<body>
-
-{html_final}
-
-</body>
-</html>
-"""
-
-st.components.v1.html(
-    f"""
-
-    <div style="padding:20px;text-align:center;">
-
-        <a href="data:text/html;charset=utf-8,{html_export}"
-           target="_blank"
-           style="
-                background:#0f172a;
-                color:white;
-                padding:14px 24px;
-                border-radius:12px;
-                text-decoration:none;
-                font-weight:600;
-                font-family:Arial;
-           ">
-
-           🚀 Abrir versão para impressão
-
-        </a>
-
-    </div>
-
-    """,
-    height=120
-)
