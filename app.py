@@ -9,7 +9,7 @@ import os
 # =====================================================
 
 st.set_page_config(
-    page_title="M e Lopes Business Suite",
+    page_title="M e Lopes assessoria",
     layout="wide",
     page_icon="📄"
 )
@@ -141,7 +141,7 @@ logo_parceiro_upload = st.sidebar.file_uploader(
 # TELA PRINCIPAL
 # =====================================================
 
-st.title("📄 Gerador Premium de Contratos")
+st.title("Gerador de Contratos")
 st.caption("Crie contratos empresariais modernos com identidade visual profissional.")
 
 col1, col2 = st.columns([1, 1])
